@@ -687,14 +687,21 @@ import os
 
 def load_course_df():
     print("🌍 RAILWAY_ENVIRONMENT:", os.environ.get("RAILWAY_ENVIRONMENT"))
-    if os.environ.get("RAILWAY_ENVIRONMENT"):
-        file_id = os.environ.get("COURSE_CSV_DRIVE_ID")
-        print("📂 COURSE_CSV_DRIVE_ID:", file_id)
-        if file_id and not os.path.exists("course_cleaned.csv"):
-            url = f"https://drive.google.com/uc?id={file_id}"
-            print(f"⬇️ Downloading from: {url}")
-            gdown.download(url, "course_cleaned.csv", quiet=False)
-    return pd.read_csv("course_cleaned.csv")
+    file_id = os.environ.get("COURSE_CSV_DRIVE_ID")
+    
+    # Only download if running on Railway AND the file doesn't exist yet
+    if os.environ.get("RAILWAY_ENVIRONMENT") and file_id and not os.path.exists("course_cleaned.csv"):
+        url = f"https://drive.google.com/uc?id={file_id}"
+        print(f"⬇️ Downloading from: {url}")
+        import gdown
+        gdown.download(url, "course_cleaned.csv", quiet=False)
+    
+    # ✅ After ensuring it's downloaded, load only selected columns
+    return pd.read_csv(
+        "course_cleaned.csv",
+        usecols=["course_id", "course_name", "image_url", "category", "calories", "sugar", "fiber"]
+    )
+
 
 # ✅ Call the loader
 course_df = load_course_df()
