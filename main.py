@@ -18,7 +18,7 @@ app = dash.Dash(
     ],
     suppress_callback_exceptions=True
 )
-
+server = app.server
 # Add custom styles
 app.index_string = '''
 <!DOCTYPE html>
@@ -133,4 +133,4 @@ app.clientside_callback(
 )
 
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    app.run_server(debug=False, host="0.0.0.0", port=8080)
