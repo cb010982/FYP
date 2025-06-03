@@ -672,6 +672,7 @@
 import dash
 from dash import dcc, html, Input, Output, State, ctx, ALL, MATCH
 import dash_bootstrap_components as dbc
+import gdown
 import pandas as pd
 import torch
 import torch.nn as nn
@@ -681,7 +682,20 @@ from sklearn.preprocessing import MinMaxScaler
 import plotly.express as px
 from db import SessionLocal
 from sqlalchemy import text
+import os
 
+
+def load_course_df():
+    if os.environ.get("RAILWAY_ENVIRONMENT"):
+        file_id = os.environ.get("COURSE_CSV_DRIVE_ID")
+        if file_id and not os.path.exists("course_cleaned.csv"):
+            url = f"https://drive.google.com/uc?id={file_id}"
+            gdown.download(url, "course_cleaned.csv", quiet=False)
+    # Local fallback
+    return pd.read_csv("course_cleaned.csv")
+
+# ✅ Call the loader
+course_df = load_course_df()
 external_stylesheets = [
     dbc.themes.BOOTSTRAP,
     'https://use.fontawesome.com/releases/v5.15.4/css/all.css'
@@ -702,7 +716,8 @@ from recommendation_logic import (
 # Load Data
 file_path = "filtered_df.csv"
 df = pd.read_csv(file_path)
-course_df = pd.read_csv("course_cleaned.csv")
+course_df = load_course_df()
+# course_df = pd.read_csv("course_cleaned.csv")
 course_df["category"] = course_df["category"].str.lower()
 scaler = joblib.load("trained_scaler.pkl")
 
