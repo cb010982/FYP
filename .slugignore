@@ -7,3 +7,15 @@ __pycache__/
 venv/
 *.data
 *.npy
+
+
+script.py
+render.yaml
+index.py
+migrate_sqlite_to_supabase.py
+dietrecommendationmodeltraining.py
+diabetespredictionmodeltraining.py
+create_user.py
+create_sugar_table.py
+create_meals_table.py
+create_filtered_df_table.py
