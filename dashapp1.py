@@ -686,12 +686,14 @@ import os
 
 
 def load_course_df():
+    print("🌍 RAILWAY_ENVIRONMENT:", os.environ.get("RAILWAY_ENVIRONMENT"))
     if os.environ.get("RAILWAY_ENVIRONMENT"):
         file_id = os.environ.get("COURSE_CSV_DRIVE_ID")
+        print("📂 COURSE_CSV_DRIVE_ID:", file_id)
         if file_id and not os.path.exists("course_cleaned.csv"):
             url = f"https://drive.google.com/uc?id={file_id}"
+            print(f"⬇️ Downloading from: {url}")
             gdown.download(url, "course_cleaned.csv", quiet=False)
-    # Local fallback
     return pd.read_csv("course_cleaned.csv")
 
 # ✅ Call the loader
