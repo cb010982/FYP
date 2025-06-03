@@ -1,5 +1,4 @@
 *.csv
-*.pkl
 *.pt
 *.ipynb
 .DS_Store
