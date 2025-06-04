@@ -684,6 +684,21 @@ from db import SessionLocal
 from sqlalchemy import text
 import os
 
+def download_if_needed(filename, file_id):
+    if not os.path.exists(filename):
+        print(f"⬇️ Downloading {filename}...")
+        url = f"https://drive.google.com/uc?id={file_id}"
+        gdown.download(url, filename, quiet=False)
+
+# ✅ Only when deployed on Railway
+if os.environ.get("RAILWAY_ENVIRONMENT"):
+    download_if_needed("filtered_df.csv", "1b4oobA7kibaOaOdau5ZMhaFDo0NquxJe")
+    download_if_needed("nfm_dnn.pth", "1qSJ41pPwRo_F2IccmOvjwy4IZwYLqz1I")
+    download_if_needed("nfm_user_embedding.pth", "1lZtXG6i7JX2dnCluuhJ_6avT8shsq719")
+    download_if_needed("nfm_fm_layer.pth", "1OB6a_xq8Fa0Lto4NhOj_XVjLUnzEtqu7")
+    download_if_needed("nfm_item_embedding.pth", "1WVOL-K2Quckjwg7ey8QnvHzj1gbWRGYZ")
+    download_if_needed("neuralfm_model.pth", "1aQNmzeZEjOOKug8TqoUCq1kcIfyK7C2l")
+    download_if_needed("neuralfm_embedding.pth", "1fnW0ptt-kA9BlWk1dXHtObaU7WUF1lUz")
 
 def load_course_df():
     print("🌍 RAILWAY_ENVIRONMENT:", os.environ.get("RAILWAY_ENVIRONMENT"))
