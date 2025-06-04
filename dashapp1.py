@@ -714,7 +714,10 @@ def load_course_df():
     # ✅ After ensuring it's downloaded, load only selected columns
     return pd.read_csv(
         "course_cleaned.csv",
-        usecols=["course_id", "course_name", "image_url", "category", "calories", "sugar", "fiber"]
+        usecols=[
+            "course_id", "course_name", "image_url", "category",
+            "calories", "sugar", "fiber", "ingredients", "cooking_directions"
+        ]
     )
 
 
