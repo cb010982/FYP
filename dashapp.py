@@ -50,9 +50,17 @@ def create_question_card(question_idx):
 
 # Update the layout section
 layout = html.Div([
-    # Header
-    html.H4(" Let's check your diabetes risk", className="text-center mt-4"),
-    # html.P("Let's check your diabetes risk step by step", className="text-center mb-4"),
+    # Privacy notice and header
+    html.Div([
+        dbc.Alert(
+            "Notice: The information you enter will be stored and used strictly for research purposes.",
+            color="info",
+            dismissable=True,
+            className="text-center mb-0"
+        ),
+        html.H4("Let's check your diabetes risk", className="text-center mt-4")
+    ]),
+
     
     # Progress dots only
     html.Div([
@@ -90,10 +98,9 @@ layout = html.Div([
     # Store components
     dcc.Store(id="current-step", data=0),
     dcc.Store(id="answers-store", data=[q["default"] for q in questions]),
-    dcc.Store(id="temp-glucose-value", storage_type="session"),  # Added temp storage for glucose
-    dcc.Store(id="temp-bmi-value", storage_type="session"),  # NEW BMI store
+    dcc.Store(id="temp-glucose-value", storage_type="session"),  
+    dcc.Store(id="temp-bmi-value", storage_type="session"),  
 
-    
     # Prediction output
     html.Div(id="prediction-output", className="mt-4")
 ], className="prediction-container")
@@ -112,7 +119,6 @@ def store_answer(values, current_answers, current_step):
         current_answers[current_step] = values[0]
     return current_answers
 
-# Update the callback to handle progress dots instead of progress bar
 @dash.callback(
     [Output("question-card", "children"),
      Output({"type": "progress-dot", "index": ALL}, "className"),
@@ -139,7 +145,6 @@ def update_question(prev_clicks, next_clicks, current_step, answers):
     elif button_id == "next-btn" and current_step < len(questions) - 1:
         current_step += 1
     
-    # Update progress dots
     dot_classes = ["progress-dot active" if i <= current_step else "progress-dot" 
                   for i in range(len(questions))]
     
@@ -148,11 +153,10 @@ def update_question(prev_clicks, next_clicks, current_step, answers):
     
     return create_question_card(current_step), dot_classes, prev_disabled, next_text, current_step
 
-# Modify the predict_diabetes callback to store the glucose value
 @dash.callback(
     [Output("prediction-output", "children"),
      Output("temp-glucose-value", "data"),
-     Output("temp-bmi-value", "data")], #added bmi to return
+     Output("temp-bmi-value", "data")], 
     Input("next-btn", "n_clicks"),
     [State("answers-store", "data"),
      State("current-step", "data")]
@@ -178,7 +182,7 @@ def predict_diabetes(n_clicks, answers, current_step):
                         className="mt-3"
                     )
                 ], className="text-center")
-            ], className="prediction-result"), glucose, bmi #added bmi to return
+            ], className="prediction-result"), glucose, bmi 
         
         user_input = np.array([answers])
         prediction = rf_model.predict(user_input)[0]
@@ -192,20 +196,20 @@ def predict_diabetes(n_clicks, answers, current_step):
                 ),
                 html.Div([
                     dbc.Button(
-                        "Proceed to Get Diet Recommendations",  # Updated button text
-                        href="/login",  # Changed from /signin to /dashapp1
+                        "Proceed to Get Diet Recommendations", 
+                        href="/login",  
                         color="success",
                         className="mt-3"
                     )
                 ], className="text-center")
-            ], className="prediction-result"), glucose, bmi #added bmi to return
+            ], className="prediction-result"), glucose, bmi 
         else:
             return html.Div([
                 dbc.Alert(
                     f"The model predicts no diabetes with a probability of {1 - prob:.2f}",
                     color="success"
                 )
-            ], className="prediction-result"), glucose, bmi #added bmi to return
+            ], className="prediction-result"), glucose, bmi 
             
     except Exception as e:
         return html.Div([
@@ -215,7 +219,6 @@ def predict_diabetes(n_clicks, answers, current_step):
             )
         ], className="prediction-result"), None
 
-# Add new callback for + and - buttons
 @dash.callback(
     Output({"type": "question-input", "index": MATCH}, "value"),
     [Input({"type": "increase-btn", "index": MATCH}, "n_clicks"),

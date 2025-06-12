@@ -1,6 +1,10 @@
+from sqlalchemy import text
 import torch
 import pandas as pd
 from dash import html
+from sqlalchemy import text
+from db import SessionLocal
+
 
 # Define thresholds (can be moved to a config module)
 sugar_thresholds = {
@@ -32,29 +36,81 @@ def get_model_recommendations(user_index, model, course_df, num_items, top_n=50)
     sorted_indices = torch.argsort(scores, descending=True).tolist()
     return course_df.iloc[sorted_indices[:top_n]]
 
+def get_filtered_recommendations(
+    user_index, sugar_value, bmi_value, is_new_user, course_df, model, num_items, top_n=10
+):
+ 
 
-def get_filtered_recommendations(user_index, sugar_value, bmi_value, is_new_user, course_df, model, num_items, top_n=10):
     sugar_category = classify_sugar_level(sugar_value)
-    thresholds = sugar_thresholds[sugar_category]
-    recs = course_df.copy() if is_new_user else get_model_recommendations(user_index, model, course_df, num_items, top_n=top_n)
+    thresholds = sugar_thresholds[sugar_category].copy()
 
-    if is_new_user and bmi_value is not None:
+    # Step 1: Adjust thresholds if new user with high BMI
+    # if is_new_user and bmi_value is not None:
+    #     bmi_value = float(bmi_value)
+    #     if bmi_value >= 30:
+    #         thresholds["max_calories"] -= 100
+    #         thresholds["max_sugar"] -= 5
+    #         thresholds["min_fiber"] += 0.5
+    if bmi_value is not None:
         bmi_value = float(bmi_value)
         if bmi_value >= 30:
             thresholds["max_calories"] -= 100
             thresholds["max_sugar"] -= 5
             thresholds["min_fiber"] += 0.5
 
+    #  Prevent crash for new users with user_index = None
+    if is_new_user and user_index is not None:
+        db = SessionLocal()
+        try:
+            result = db.execute(text("""
+                SELECT COUNT(*) FROM filtered_df
+                WHERE user_index = :user_index
+            """), {"user_index": int(user_index)})
+            count = result.scalar()
+            if count > 0:
+                is_new_user = False
+        finally:
+            db.close()
+
+    # Step 2: Get base recommendations
+    recs = course_df.copy() if is_new_user else get_model_recommendations(
+        user_index, model, course_df, num_items, top_n=100
+    )
+
+    # Step 3: Apply filters
     filtered = recs[
         (recs["sugar"] <= thresholds["max_sugar"]) &
         (recs["calories"] <= thresholds["max_calories"]) &
         (recs["fiber"] >= thresholds["min_fiber"])
     ]
 
+    # Step 4: Filter out liked/disliked if returning user
+    if not is_new_user and user_index is not None:
+        db = SessionLocal()
+        try:
+            result = db.execute(text("""
+                SELECT course_id, rating FROM filtered_df
+                WHERE user_index = :user_index
+            """), {"user_index": int(user_index)})
+
+            interactions = result.fetchall()
+            disliked_ids = [row[0] for row in interactions if row[1] == 0]
+            liked_ids = [row[0] for row in interactions if row[1] == 1]
+
+            #  Convert course_id column in DataFrame to same type as DB IDs
+            filtered["course_id"] = filtered["course_id"].astype(str)  # or int, match your DB
+            disliked_ids = [str(x) for x in disliked_ids]  # match the DataFrame type
+            liked_ids = [str(x) for x in liked_ids]
+
+            filtered = filtered[~filtered["course_id"].isin(disliked_ids + liked_ids)]
+        finally:
+            db.close()
+
     return filtered.head(top_n)
 
+
 def reinforcement_update_batch(model, user_tensor, item_tensor, label_tensor):
-    print(f"🧠 Starting batch training on {len(user_tensor)} samples...")
+    print(f" Starting batch training on {len(user_tensor)} samples...")
     model.train()
     optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     criterion = torch.nn.BCELoss()
@@ -66,4 +122,4 @@ def reinforcement_update_batch(model, user_tensor, item_tensor, label_tensor):
     optimizer.step()
 
     model.eval()
-    print("✅ Reinforcement batch update done")
+    print(" Reinforcement batch update done")

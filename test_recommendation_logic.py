@@ -9,8 +9,14 @@ def test_classify_sugar_level():
     assert classify_sugar_level(200) == "high"
 
 def test_get_filtered_recommendations_with_mock_model():
+    class MockItemEmbedding:
+        num_embeddings = 10  
+
     class MockModel:
-        def __call__(self, user, item): return torch.rand(len(item))
+        item_embedding = MockItemEmbedding()
+
+        def __call__(self, user, item):
+            return torch.rand(len(item))
 
     dummy_courses = pd.DataFrame({
         "course_id": range(10),

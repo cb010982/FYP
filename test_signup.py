@@ -12,10 +12,10 @@ def mock_db(monkeypatch):
 
 def test_signup_success(monkeypatch, mock_db):
     mock_db.execute.side_effect = [
-        MagicMock(fetchone=lambda: None),        # check duplicate
-        MagicMock(scalar=lambda: 1),             # get max user_id
-        None,  # insert user
-        None,  # insert sugar
+        MagicMock(fetchone=lambda: None),       
+        MagicMock(scalar=lambda: 1),             
+        None,
+        None,  
     ]
     mock_db.commit = MagicMock()
 
@@ -28,7 +28,7 @@ def test_signup_success(monkeypatch, mock_db):
     )
 
     assert result[0] == "/dashapp1"
-    assert result[1] == "2"  # 1 + 1
+    assert result[1] == "2" 
     assert result[2] == "Test User"
     assert result[3] == "110.0"
     assert result[4] == "22.5"
@@ -36,7 +36,7 @@ def test_signup_success(monkeypatch, mock_db):
 
 def test_signup_duplicate_email(monkeypatch, mock_db):
     mock_db.execute.side_effect = [
-        MagicMock(fetchone=lambda: True),  # email already exists
+        MagicMock(fetchone=lambda: True), 
     ]
     result = handle_signup_logic("User", "test@example.com", "pass", 100, 20)
     assert result == (dash.no_update, None, None, None, None)

@@ -3,14 +3,13 @@ import numpy as np
 from dash import html
 from dash.exceptions import PreventUpdate
 
-# Patch model
 @pytest.fixture(autouse=True)
 def mock_model(monkeypatch):
     class MockModel:
         def predict(self, X):
-            return [1]  # Pretend user is diabetic
+            return [1]  
         def predict_proba(self, X):
-            return np.array([[0.2, 0.8]])  # Return as NumPy array
+            return np.array([[0.2, 0.8]])  
 
     monkeypatch.setattr("dashapp.rf_model", MockModel())
 

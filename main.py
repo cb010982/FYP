@@ -2,7 +2,7 @@ import dash
 from dash import html, dcc
 import dash_bootstrap_components as dbc
 from dashapp import layout as dashapp_layout
-from dashapp1 import layout as dashapp1_layout  # Add this import
+from dashapp1 import layout as dashapp1_layout  
 from dash.dependencies import Input, Output
 from login import layout as login_layout
 from signup import layout as signup_layout
@@ -19,63 +19,36 @@ app = dash.Dash(
     suppress_callback_exceptions=True
 )
 server = app.server
-# Add custom styles
-app.index_string = '''
-<!DOCTYPE html>
-<html>
-    <head>
-        {%metas%}
-        <title>{%title%}</title>
-        {%favicon%}
-        {%css%}
-        <style>
-            .card-hover {
-                transition: all 0.3s ease-in-out;
-            }
-            .card-hover:hover {
-                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-                border: 2px solid #0d5720 !important;
-                transform: translateY(-5px);
-            }
-        </style>
-    </head>
-    <body>
-        {%app_entry%}
-        <footer>
-            {%config%}
-            {%scripts%}
-            {%renderer%}
-        </footer>
-    </body>
-</html>
-'''
 
 app.title = "Landing Page"
 
-# Add after app initialization
 init_login_callbacks(app)
 init_signup_callbacks(app)
 
-# Simplified main layout without navigation
 app.layout = html.Div([
     dcc.Location(id="url", refresh=False),
-    html.Div(id="page-content")  # Placeholder for dynamic content
+    html.Div(id="page-content")  
 ])
 
 # Define navigation bar component
 nav_bar = html.Nav([
     html.Div([
         html.Span("EatSafe", className="brand"),
+
+        # Full nav links (visible on desktop)
         html.Ul([
             html.Li(html.A("Home", href="/", className="active")),
             html.Li(html.A("Diabetes Prediction", href="/dashapp")),
             html.Li(html.A("Get Started", href="/dashapp")),
             html.Li(html.A("Login", href="/login")),
             html.Li(html.A("Begin", href="/dashapp")),
-        ], className="nav-links"),
+        ], className="nav-links full-nav"),
+
+        # Mobile nav minimal links
         html.Div([
-            html.A("Get Started", href="/dashapp", className="get-started-btn")
-        ], className="nav-btn")
+            html.A("Login", href="/login", className="mobile-login-link", style={"display": "block", "width": "100%", "textAlign": "center"}),
+            html.A("Get Started", href="/dashapp", className="mobile-get-started-btn", style={"display": "block", "width": "100%", "textAlign": "center"})
+        ], className="mobile-nav")
     ], className="nav-container")
 ], className="glass-navbar")
 
@@ -88,7 +61,7 @@ home_layout = html.Div([
             html.P("Let's control diabetes through dietary interventions!", className="lead"),
             html.Div([
                 dbc.Button("Get Started", color="danger", href="/dashapp")
-            ], className="d-flex mt-3")
+            ])
         ], className="hero-text")
     ], className="hero-section")
 ])
@@ -110,6 +83,7 @@ def display_page(pathname):
         return home_layout
     else:
         return html.H1("404 - Page not found", className="text-center")
+    
 app.clientside_callback(
     """
     function(nLeft, nRight) {
