@@ -2,11 +2,11 @@ import pytest
 from dashapp1 import display_recommendations
 from unittest.mock import patch
 from dash import html
+from sqlalchemy.engine import ResultProxy
+import pandas as pd
 
 @pytest.fixture
 def mock_user_mapping(monkeypatch):
-    from sqlalchemy.engine import ResultProxy
-    import pandas as pd
 
     fake_user_id = 101
     fake_user_index = 9

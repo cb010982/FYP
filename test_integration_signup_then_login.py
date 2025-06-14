@@ -3,17 +3,17 @@ from unittest.mock import MagicMock
 from signup import handle_signup_logic
 from login import handle_login_logic
 from sqlalchemy import text
+from login import bcrypt
+from signup import SessionLocal as SignupSession
+from login import SessionLocal as LoginSession
+from bcrypt import hashpw, gensalt
 
 @pytest.fixture
 def mock_session(monkeypatch):
-    from signup import SessionLocal as SignupSession
-    from login import SessionLocal as LoginSession
-
 
     fake_users = []
     fake_sugar_levels = []
 
-    
     mock_db = MagicMock()
 
     def execute(query, params=None):
@@ -82,7 +82,6 @@ def test_signup_then_login(mock_session):
     sugar = 120
     bmi_value = 23.5
 
-    from bcrypt import hashpw, gensalt
     hashed_password = hashpw(password.encode(), gensalt()).decode()
 
     # Step 1: Sign up
@@ -92,10 +91,8 @@ def test_signup_then_login(mock_session):
 
     # Step 2: Login
 
-    from login import bcrypt
     mock_session  
     bcrypt.checkpw = lambda p, h: True
-
 
     login_result = handle_login_logic(name, password, sugar, bmi_value)
     assert login_result[0] == "/dashapp1"

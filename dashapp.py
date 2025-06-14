@@ -10,13 +10,13 @@ rf_model = joblib.load("diabetes_random_forest_model.pkl")
 
 # Define questions
 questions = [
-    {"id": "pregnancies", "label": "Number of pregnancies you had?", "min": 0, "max": 20, "default": 1},
-    {"id": "glucose", "label": "What is your current glucose level?", "min": 0, "max": 200, "default": 120},
-    {"id": "blood_pressure", "label": "What is your current blood pressure?", "min": 0, "max": 150, "default": 70},
-    {"id": "skin_thickness", "label": "Measure of your skin thickness", "min": 0, "max": 100, "default": 20},
-    {"id": "insulin", "label": "What is your current insulin level?", "min": 0, "max": 900, "default": 79},
+    {"id": "pregnancies", "label": "How many pregnancies have you had? (If not applicable, enter 0)", "min": 0, "max": 20, "default": 1},
+    {"id": "glucose", "label": "What is your current glucose level (mg/dL)?", "min": 0, "max": 200, "default": 120},
+    {"id": "blood_pressure", "label": "What is your current diastolic blood pressure (mm Hg)?", "min": 0, "max": 150, "default": 70},
+    {"id": "skin_thickness", "label": "Measure of your skinfold thickness (mm)", "min": 0, "max": 100, "default": 20},
+    {"id": "insulin", "label": "What is your current insulin level (μU/mL)?", "min": 0, "max": 900, "default": 79},
     {"id": "bmi", "label": "What is your BMI?", "min": 0, "max": 70, "default": 25.0},
-    {"id": "dpf", "label": "What is your Diabetes Pedigree Function level at?", "min": 0, "max": 2.5, "default": 0.5},
+    {"id": "dpf", "label": "What is your Diabetes Pedigree Function (DPF) score?", "min": 0, "max": 2.5, "default": 0.5},
     {"id": "age", "label": "Your Age?", "min": 0, "max": 120, "default": 30}
 ]
 
@@ -39,7 +39,7 @@ def create_question_card(question_idx):
                 value=question["default"],
                 className="number-input text-center",
                 readonly=True
-            ),
+            ),          
             dbc.Button("+", 
                 id={"type": "increase-btn", "index": question_idx},
                 color="light",
@@ -53,7 +53,7 @@ layout = html.Div([
     # Privacy notice and header
     html.Div([
         dbc.Alert(
-            "Notice: The information you enter will be stored and used strictly for research purposes.",
+            "The information you enter will be stored and used for research purposes only.",
             color="info",
             dismissable=True,
             className="text-center mb-0"
@@ -61,7 +61,6 @@ layout = html.Div([
         html.H4("Let's check your diabetes risk", className="text-center mt-4")
     ]),
 
-    
     # Progress dots only
     html.Div([
         html.Div([

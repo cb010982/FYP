@@ -119,3 +119,13 @@ def init_callbacks(app):
         if glucose_value is not None:
             return glucose_value
         return dash.no_update
+    @app.callback(
+        Output("login-bmi", "value"),
+        Input("temp-bmi-value", "data")
+    )
+    def prefill_bmi_value(bmi_value):
+        if bmi_value is not None:
+            return bmi_value
+        return dash.no_update
+
+  

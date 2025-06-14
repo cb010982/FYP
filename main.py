@@ -35,7 +35,7 @@ nav_bar = html.Nav([
     html.Div([
         html.Span("EatSafe", className="brand"),
 
-        # Full nav links (visible on desktop)
+        # Desktop Nav links
         html.Ul([
             html.Li(html.A("Home", href="/", className="active")),
             html.Li(html.A("Diabetes Prediction", href="/dashapp")),
@@ -44,7 +44,7 @@ nav_bar = html.Nav([
             html.Li(html.A("Begin", href="/dashapp")),
         ], className="nav-links full-nav"),
 
-        # Mobile nav minimal links
+        # Mobile nav links
         html.Div([
             html.A("Login", href="/login", className="mobile-login-link", style={"display": "block", "width": "100%", "textAlign": "center"}),
             html.A("Get Started", href="/dashapp", className="mobile-get-started-btn", style={"display": "block", "width": "100%", "textAlign": "center"})

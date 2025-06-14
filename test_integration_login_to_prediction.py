@@ -4,6 +4,7 @@ from dashapp import predict_diabetes
 from unittest.mock import patch
 import dash
 import numpy as np
+from login import bcrypt
 
 @pytest.fixture
 def mock_login_session(monkeypatch):
@@ -31,8 +32,6 @@ def mock_login_session(monkeypatch):
 
     monkeypatch.setattr("login.SessionLocal", lambda: MockDB())
 
-
-    from login import bcrypt
     monkeypatch.setattr(bcrypt, "checkpw", lambda p, h: True)
 
 def test_login_then_predict(mock_login_session):

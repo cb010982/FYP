@@ -44,13 +44,6 @@ def get_filtered_recommendations(
     sugar_category = classify_sugar_level(sugar_value)
     thresholds = sugar_thresholds[sugar_category].copy()
 
-    # Step 1: Adjust thresholds if new user with high BMI
-    # if is_new_user and bmi_value is not None:
-    #     bmi_value = float(bmi_value)
-    #     if bmi_value >= 30:
-    #         thresholds["max_calories"] -= 100
-    #         thresholds["max_sugar"] -= 5
-    #         thresholds["min_fiber"] += 0.5
     if bmi_value is not None:
         bmi_value = float(bmi_value)
         if bmi_value >= 30:
@@ -123,3 +116,17 @@ def reinforcement_update_batch(model, user_tensor, item_tensor, label_tensor):
 
     model.eval()
     print(" Reinforcement batch update done")
+
+
+    # torch.save(model.user_embedding.state_dict(), "nfm_user_embedding.pth")
+    # torch.save(model.item_embedding.state_dict(), "nfm_item_embedding.pth")
+    # torch.save(model.fm_layer.state_dict(), "nfm_fm_layer.pth")
+    # torch.save(model.dnn.state_dict(), "nfm_dnn.pth")
+
+    # model.user_embedding.load_state_dict(torch.load("nfm_user_embedding.pth"))
+    # model.item_embedding.load_state_dict(torch.load("nfm_item_embedding.pth"))
+    # model.fm_layer.load_state_dict(torch.load("nfm_fm_layer.pth"))
+    # model.dnn.load_state_dict(torch.load("nfm_dnn.pth"))
+    # model.eval()
+
+

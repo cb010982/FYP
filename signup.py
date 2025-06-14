@@ -41,6 +41,17 @@ layout = html.Div([
                         ], className="auth-label"),
                         dbc.Input(id="sugar", type="number", placeholder="e.g. 110", min=50, max=300, step=1, className="mb-3"),
                         
+                        dbc.Label("Your BMI *", className="auth-label"),
+                        dbc.Input(
+                            id="signup-bmi",
+                            type="number",
+                            placeholder="e.g. 23.5",
+                            min=10,
+                            max=60,
+                            step=0.1,
+                            className="mb-3"
+                        ),
+
                         dbc.Button("Sign Up", id="signup-button", className="w-100 auth-button")
                     ]),
                     
@@ -112,7 +123,7 @@ def init_callbacks(app):
         State("signup-email", "value"),
         State("signup-password", "value"),
         State("sugar", "value"),
-        State("temp-bmi-value", "data"),
+        State("signup-bmi", "value"),
         prevent_initial_call=True
     )
     def process_signup(n_clicks, name, email, password, sugar, bmi_value):
@@ -128,3 +139,14 @@ def init_callbacks(app):
         if glucose_value is not None:
             return glucose_value
         return dash.no_update
+    
+    @app.callback(
+    Output("signup-bmi", "value"),
+    Input("temp-bmi-value", "data")
+    )
+    
+    def prefill_bmi_value(bmi_value):
+        if bmi_value is not None:
+            return bmi_value
+        return dash.no_update
+

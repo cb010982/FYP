@@ -8,18 +8,19 @@ def test_classify_sugar_level():
     assert classify_sugar_level(140) == "normal"
     assert classify_sugar_level(200) == "high"
 
-def test_get_filtered_recommendations_with_mock_model():
+def test_get_filtered_recommendations_with_mock_model(monkeypatch):
+    # Mock model
     class MockItemEmbedding:
-        num_embeddings = 10  
+        num_embeddings = 10
 
     class MockModel:
         item_embedding = MockItemEmbedding()
-
         def __call__(self, user, item):
             return torch.rand(len(item))
 
+    # Dummy course data
     dummy_courses = pd.DataFrame({
-        "course_id": range(10),
+        "course_id": [str(i) for i in range(10)],
         "sugar": [10]*10,
         "calories": [300]*10,
         "fiber": [3]*10,
@@ -30,16 +31,42 @@ def test_get_filtered_recommendations_with_mock_model():
         "cooking_directions": ["step"]*10
     })
 
-    filtered = get_filtered_recommendations(
-        user_index=0,
+    # Mock DB session 
+    class MockResult:
+        def scalar(self): return 0
+        def fetchall(self): return [(0, 0), (1, 1)]  # disliked 0, liked 1
+
+    class MockDB:
+        def execute(self, query, params=None): return MockResult()
+        def close(self): pass
+
+    monkeypatch.setattr("recommendation_logic.SessionLocal", lambda: MockDB())
+
+    #  New user with high BMI
+    result = get_filtered_recommendations(
+        user_index=None,
         sugar_value=150,
-        bmi_value=28,
-        is_new_user=False,
+        bmi_value=31,
+        is_new_user=True,
         course_df=dummy_courses,
         model=MockModel(),
         num_items=10,
         top_n=5
     )
+    assert not result.empty
+    assert len(result) <= 5
 
-    assert not filtered.empty
-    assert len(filtered) <= 5
+    # Returning user with liked/disliked meals (should filter them out)
+    result2 = get_filtered_recommendations(
+        user_index=0,
+        sugar_value=150,
+        bmi_value=25,
+        is_new_user=False,
+        course_df=dummy_courses,
+        model=MockModel(),
+        num_items=10,
+        top_n=10
+    )
+    assert not result2.empty
+    assert all(cid not in ["0", "1"] for cid in result2["course_id"])
+

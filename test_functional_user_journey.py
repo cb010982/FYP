@@ -110,4 +110,9 @@ def test_full_user_journey(monkeypatch):
         dislike_times=[None, None],
         user_id=user_id
     )
-    assert result.startswith(" Feedback recorded for course")
+
+    feedback_msg, is_open, toast_msg = result
+
+    assert feedback_msg.startswith(" Feedback recorded for course")
+    assert is_open is True
+    assert "Feedback saved for" in toast_msg
