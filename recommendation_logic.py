@@ -88,14 +88,16 @@ def get_filtered_recommendations(
 
             interactions = result.fetchall()
             disliked_ids = [row[0] for row in interactions if row[1] == 0]
-            liked_ids = [row[0] for row in interactions if row[1] == 1]
+            # liked_ids = [row[0] for row in interactions if row[1] == 1]
 
             #  Convert course_id column in DataFrame to same type as DB IDs
-            filtered["course_id"] = filtered["course_id"].astype(str)  # or int, match your DB
+            filtered["course_id"] = filtered["course_id"].astype(str)  # or int, match DB
             disliked_ids = [str(x) for x in disliked_ids]  # match the DataFrame type
-            liked_ids = [str(x) for x in liked_ids]
+            # liked_ids = [str(x) for x in liked_ids]
 
-            filtered = filtered[~filtered["course_id"].isin(disliked_ids + liked_ids)]
+            # filtered = filtered[~filtered["course_id"].isin(disliked_ids + liked_ids)]
+            filtered = filtered[~filtered["course_id"].isin(disliked_ids)]
+
         finally:
             db.close()
 
