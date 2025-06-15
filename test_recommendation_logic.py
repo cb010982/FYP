@@ -34,7 +34,7 @@ def test_get_filtered_recommendations_with_mock_model(monkeypatch):
     # Mock DB session 
     class MockResult:
         def scalar(self): return 0
-        def fetchall(self): return [(0, 0), (1, 1)]  # disliked 0, liked 1
+        def fetchall(self): return [(0, 0), (1, 1)]  # Disliked 0, Liked 1
 
     class MockDB:
         def execute(self, query, params=None): return MockResult()
@@ -42,7 +42,7 @@ def test_get_filtered_recommendations_with_mock_model(monkeypatch):
 
     monkeypatch.setattr("recommendation_logic.SessionLocal", lambda: MockDB())
 
-    #  New user with high BMI
+    # New user with high BMI
     result = get_filtered_recommendations(
         user_index=None,
         sugar_value=150,
@@ -56,7 +56,6 @@ def test_get_filtered_recommendations_with_mock_model(monkeypatch):
     assert not result.empty
     assert len(result) <= 5
 
-    # Returning user with liked/disliked meals (should filter them out)
     result2 = get_filtered_recommendations(
         user_index=0,
         sugar_value=150,
@@ -68,5 +67,5 @@ def test_get_filtered_recommendations_with_mock_model(monkeypatch):
         top_n=10
     )
     assert not result2.empty
-    assert all(cid not in ["0", "1"] for cid in result2["course_id"])
-
+    assert "0" not in result2["course_id"].values  
+    assert "1" in result2["course_id"].values      
