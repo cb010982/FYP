@@ -83,10 +83,7 @@ df[zero_columns] = df[zero_columns].replace(0, np.nan)
 # Check for NaNs and impute (median)
 df.fillna(df.median(), inplace=True)
 
-"""# **Exploratory Data Analysis**
-
-### **Class Distribution**
-"""
+"""### **Class Distribution**"""
 
 #Class Distribution
 plt.style.use("dark_background")
@@ -375,8 +372,6 @@ plt.figure(figsize=(10, 6))
 sns.heatmap(corr_matrix, annot=True, cmap="coolwarm", linewidths=0.5, fmt=".2f")
 plt.title("Feature Correlation Heatmap", fontsize=14, color="white")
 plt.show()
-
-"""# **Preprocessing**"""
 
 # Splitting features and target
 features = df.drop(columns=['Outcome'])
